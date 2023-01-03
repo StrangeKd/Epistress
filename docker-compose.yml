@@ -1,0 +1,40 @@
+version: "3.1"
+
+services:
+  api-back:
+    build: .
+    image: ${IMAGE_NAME}
+    container_name: api-back
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - api-db
+    volumes:
+      - ${UPLOAD_VOLUME}:/usr/src/node-app/uploads
+      - ${LOGS_VOLUME}:/usr/src/node-app/logs
+    networks:
+      - api-network
+    command: npm start
+
+  api-db:
+    container_name: api-db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - api-db:/var/lib/postgresql/data
+    networks:
+      - api-network
+
+volumes:
+  api-db:
+    name: api-db
+
+networks:
+  api-network:
+    driver: bridge
